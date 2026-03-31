@@ -9,7 +9,7 @@ It takes a 2D sprite-sheet grid (`input/master_icons.png`) and automatically gen
 | `output/icons.h` | C++ PROGMEM header for ESP32 / TFT_eSPI |
 | `output/icons.scss` | SCSS file using CSS mask-position for an Angular frontend |
 
-Empty / fully-transparent grid cells are detected and **automatically skipped**, so no flash memory or CSS rules are wasted on blank slots.
+Empty / fully-transparent grid cells at the **end** of the grid are allowed (unused trailing slots). However, the engine **rejects** any sprite sheet that has an empty cell in the middle of the sequence — ensuring the icon index is always a dense, contiguous range starting at `0`.
 
 ---
 
@@ -17,18 +17,21 @@ Empty / fully-transparent grid cells are detected and **automatically skipped**,
 
 The engine reads the PNG and divides it into a uniform grid of 16×16-pixel cells, scanning left-to-right, top-to-bottom.
 
-Before processing each cell it inspects **all 256 pixels**.  
-If every pixel has an alpha value of `0` (fully transparent), the cell is considered an _empty slot_ and is silently skipped.  
-Only non-empty cells receive a sequential `validIconIndex` and produce output — this index is contiguous and always starts at `0`.
+Icons must be packed **continuously** from the top-left corner. Each cell is scanned for alpha values — a cell with every pixel at alpha `0` marks the end of the icon set (trailing padding). Any empty cell that is followed by a non-empty cell is treated as a **gap** and causes the build to exit with an error.
 
 ```
 sprite sheet grid (cols × rows)
 ┌────┬────┬────┬────┐
-│  0 │  1 │    │  2 │   ← cell 2 is empty → skipped
+│  0 │  1 │  2 │  3 │   ← all filled, valid
 ├────┼────┼────┼────┤
-│  3 │    │  4 │  5 │   ← cell 5 is empty → skipped
+│  4 │  5 │    │    │   ← trailing empty cells, OK
 └────┴────┴────┴────┘
-Valid icons: 0 1 2 3 4  (5 icons from 8 cells)
+Icons exported: 0 1 2 3 4 5  (2 trailing empty cells ignored)
+
+┌────┬────┬────┬────┐
+│  0 │    │  1 │  2 │   ← ERROR: gap at (col 1, row 0)
+└────┴────┴────┴────┘
+Build fails with an error message.
 ```
 
 ---
@@ -54,7 +57,7 @@ Place your sprite sheet at:
 input/master_icons.png
 ```
 
-The image **must** have both a width and height that are exact multiples of 16.
+The image **must** have both a width and height that are exact multiples of 16. Icons must be packed continuously left-to-right, top-to-bottom — trailing transparent cells are allowed as padding, but gaps in the middle will cause an error.
 
 ### Run the build
 

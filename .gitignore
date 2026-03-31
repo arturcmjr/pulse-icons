@@ -5,9 +5,6 @@ node_modules/
 output/icons.h
 output/icons.scss
 
-# Input sprite sheet (provided by user, not version-controlled)
-input/master_icons.png
-
 # OS / Editor artefacts
 .DS_Store
 *.swp
