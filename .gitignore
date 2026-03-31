@@ -1,0 +1,11 @@
+# Dependencies
+node_modules/
+
+# Generated output files (re-created by npm run build)
+output/icons.h
+output/icons.scss
+
+# OS / Editor artefacts
+.DS_Store
+*.swp
+Thumbs.db
