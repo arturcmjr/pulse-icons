@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Generated output files (re-created by npm run build)
+output/icons.h
+output/icons.scss
+
+# Input sprite sheet (provided by user, not version-controlled)
+input/master_icons.png
+
+# OS / Editor artefacts
+.DS_Store
+*.swp
+Thumbs.db

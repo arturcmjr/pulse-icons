@@ -1,0 +1,12 @@
+{
+  "name": "pulse-icons",
+  "version": "1.0.0",
+  "description": "Asset pipeline for Pulse smart home system – generates C++ and SCSS icon assets from a 16×16 sprite sheet.",
+  "main": "src/generate.js",
+  "scripts": {
+    "build": "node src/generate.js"
+  },
+  "dependencies": {
+    "jimp": "^1.6.0"
+  }
+}
