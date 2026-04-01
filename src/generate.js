@@ -2,7 +2,7 @@
 /**
  * Pulse Icon Asset Pipeline – Smart Grid Engine
  *
- * Reads input/master_icons.png (a 2D sprite sheet of 16×16 icons),
+ * Reads input/master_icons.png (a 2D sprite sheet of 24×24 icons),
  * validates that icons are packed left-to-right, top-to-bottom with no gaps,
  * and writes:
  *   output/icons.h    – C++ PROGMEM header for ESP32 / TFT_eSPI
@@ -15,7 +15,7 @@ const path = require('path');
 const fs   = require('fs');
 const { Jimp } = require('jimp');
 
-const ICON_SIZE   = 16;
+const ICON_SIZE   = 24;
 const INPUT_FILE  = path.resolve(__dirname, '../input/master_icons.png');
 const OUTPUT_DIR  = path.resolve(__dirname, '../output');
 const CPP_FILE    = path.join(OUTPUT_DIR, 'icons.h');
@@ -24,13 +24,13 @@ const SCSS_FILE   = path.join(OUTPUT_DIR, 'icons.scss');
 // ─── helpers ────────────────────────────────────────────────────────────────
 
 /**
- * Pack an array of 256 pixel-alpha values (0 or 1) into 32 bytes, MSB first.
- * @param {number[]} bits – array of 256 values (1 = solid, 0 = transparent)
+ * Pack an array of 576 pixel-alpha values (0 or 1) into 72 bytes, MSB first.
+ * @param {number[]} bits – array of 576 values (1 = solid, 0 = transparent)
  * @returns {string} comma-separated hex byte literals, e.g. "0xFF, 0x00, ..."
  */
 function packBits(bits) {
   const bytes = [];
-  for (let i = 0; i < 256; i += 8) {
+  for (let i = 0; i < ICON_SIZE * ICON_SIZE; i += 8) {
     let byte = 0;
     for (let b = 0; b < 8; b++) {
       byte = (byte << 1) | (bits[i + b] ? 1 : 0);
@@ -161,7 +161,7 @@ async function main() {
 
   for (let i = 0; i < iconCells.length; i++) {
     cppLines.push(
-      `const unsigned char icon_${i}[32] PROGMEM = { ${packBits(iconCells[i].bits)} };`
+      `const unsigned char icon_${i}[${ICON_SIZE * ICON_SIZE / 8}] PROGMEM = { ${packBits(iconCells[i].bits)} };`
     );
   }
 

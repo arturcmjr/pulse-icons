@@ -1,6 +1,6 @@
 # Pulse Icon Asset Pipeline
 
-A build tool for the **Pulse** smart home system that acts as the single source of truth for all 16×16 monochromatic UI icons.
+A build tool for the **Pulse** smart home system that acts as the single source of truth for all 24×24 monochromatic UI icons.
 
 It takes a 2D sprite-sheet grid (`input/master_icons.png`) and automatically generates:
 
@@ -15,7 +15,7 @@ Empty / fully-transparent grid cells at the **end** of the grid are allowed (unu
 
 ## How the Grid Processing Works
 
-The engine reads the PNG and divides it into a uniform grid of 16×16-pixel cells, scanning left-to-right, top-to-bottom.
+The engine reads the PNG and divides it into a uniform grid of 24×24-pixel cells, scanning left-to-right, top-to-bottom.
 
 Icons must be packed **continuously** from the top-left corner. Each cell is scanned for alpha values — a cell with every pixel at alpha `0` marks the end of the icon set (trailing padding). Any empty cell that is followed by a non-empty cell is treated as a **gap** and causes the build to exit with an error.
 
@@ -57,7 +57,7 @@ Place your sprite sheet at:
 input/master_icons.png
 ```
 
-The image **must** have both a width and height that are exact multiples of 16. Icons must be packed continuously left-to-right, top-to-bottom — trailing transparent cells are allowed as padding, but gaps in the middle will cause an error.
+The image **must** have both a width and height that are exact multiples of 24. Icons must be packed continuously left-to-right, top-to-bottom — trailing transparent cells are allowed as padding, but gaps in the middle will cause an error.
 
 ### Run the build
 
@@ -86,7 +86,7 @@ void setup() {
   tft.fillScreen(TFT_BLACK);
 
   // Draw icon at index 1 at position (10, 20)
-  tft.drawBitmap(10, 20, all_icons[1], 16, 16, TFT_WHITE);
+  tft.drawBitmap(10, 20, all_icons[1], 24, 24, TFT_WHITE);
 }
 ```
 
