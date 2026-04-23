@@ -1,0 +1,18 @@
+{
+  "battery empty": 0,
+  "battery low": 1,
+  "battery medium": 2,
+  "battery full": 3,
+  "battery charging": 4,
+  "wifi off": 5,
+  "sound": 9,
+  "vibration only": 10,
+  "mute": 11,
+  "play": 12,
+  "pause": 13,
+  "settings": 14,
+  "bell": 15,
+  "stats": 16,
+  "timer": 17,
+  "alarm": 18
+}

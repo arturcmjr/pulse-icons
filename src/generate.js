@@ -17,6 +17,7 @@ const { Jimp } = require('jimp');
 
 const ICON_SIZE   = 24;
 const INPUT_FILE  = path.resolve(__dirname, '../input/master_icons.png');
+const JSON_FILE   = INPUT_FILE.replace(/\.png$/i, '.json');
 const OUTPUT_DIR  = path.resolve(__dirname, '../output');
 const CPP_FILE    = path.join(OUTPUT_DIR, 'icons.h');
 const SCSS_FILE   = path.join(OUTPUT_DIR, 'icons.scss');
@@ -54,6 +55,15 @@ function buildFileHeader(imgWidth, imgHeight, iconCount, trailingEmpty) {
     `// Source: ${imgWidth}x${imgHeight} sprite sheet, ${ICON_SIZE}x${ICON_SIZE} icons`,
     `// Total icons: ${iconCount}  (${trailingEmpty} trailing empty cells)`,
   ];
+}
+
+/**
+ * Convert a human-readable icon name to a UPPER_SNAKE_CASE constant name.
+ * @param {string} name – e.g. "battery empty"
+ * @returns {string} – e.g. "BATTERY_EMPTY"
+ */
+function toConstName(name) {
+  return name.trim().toUpperCase().replace(/\s+/g, '_');
 }
 
 // ─── main ───────────────────────────────────────────────────────────────────
@@ -97,6 +107,18 @@ async function main() {
   console.log(`  Image  : ${imgWidth}×${imgHeight} px`);
   console.log(`  Grid   : ${cols} cols × ${rows} rows = ${totalCells} cells`);
   console.log('');
+
+  // 1b. Optionally load icon name→index map from a companion JSON file
+  let iconNames = null;
+  if (fs.existsSync(JSON_FILE)) {
+    try {
+      iconNames = JSON.parse(fs.readFileSync(JSON_FILE, 'utf8'));
+      console.log(`  Names   : ${JSON_FILE} (${Object.keys(iconNames).length} named icons)`);
+      console.log('');
+    } catch (err) {
+      console.warn(`WARNING: Could not parse ${JSON_FILE}: ${err.message}`);
+    }
+  }
 
   // 2. Scan every cell and collect bit patterns + emptiness flags
   /** @type {{ bits: number[], isEmpty: boolean, x: number, y: number }[]} */
@@ -158,6 +180,8 @@ async function main() {
   cppLines.push('');
   cppLines.push(...buildFileHeader(imgWidth, imgHeight, iconCount, trailingEmpty));
   cppLines.push('');
+  cppLines.push('namespace PulseIcons {');
+  cppLines.push('');
 
   for (let i = 0; i < iconCells.length; i++) {
     cppLines.push(
@@ -170,6 +194,17 @@ async function main() {
   cppLines.push(
     `const unsigned char* const all_icons[${iconCount}] PROGMEM = { ${ptrList} };`
   );
+
+  if (iconNames) {
+    cppLines.push('');
+    cppLines.push('// Icon name constants');
+    for (const [name, index] of Object.entries(iconNames)) {
+      cppLines.push(`constexpr uint8_t ${toConstName(name)} = ${index};`);
+    }
+  }
+
+  cppLines.push('');
+  cppLines.push('} // namespace pulse_icons');
   cppLines.push('');
 
   fs.mkdirSync(OUTPUT_DIR, { recursive: true });
