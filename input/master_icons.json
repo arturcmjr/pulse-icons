@@ -14,5 +14,9 @@
   "bell": 15,
   "stats": 16,
   "timer": 17,
-  "alarm": 18
+  "alarm": 18,
+  "shutdown": 19,
+  "restart": 20,
+  "router": 21,
+  "sync": 22
 }
